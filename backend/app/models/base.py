@@ -1,8 +1,10 @@
 import uuid
 from datetime import UTC, datetime
 
-from sqlalchemy import DateTime, Numeric, func
+from sqlalchemy import Numeric, func
 from sqlalchemy.orm import Mapped, mapped_column
+
+from app.core.dbtypes import UTCDateTime
 
 
 def utcnow() -> datetime:
@@ -15,10 +17,10 @@ class UUIDMixin:
 
 class TimestampMixin:
     created_at: Mapped[datetime] = mapped_column(
-        DateTime(timezone=True), default=utcnow, server_default=func.now(), nullable=False
+        UTCDateTime(), default=utcnow, server_default=func.now(), nullable=False
     )
     updated_at: Mapped[datetime] = mapped_column(
-        DateTime(timezone=True),
+        UTCDateTime(),
         default=utcnow,
         onupdate=utcnow,
         server_default=func.now(),

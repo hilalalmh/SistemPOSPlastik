@@ -3,7 +3,6 @@ from datetime import UTC, datetime
 
 from sqlalchemy import (
     CheckConstraint,
-    DateTime,
     ForeignKey,
     Numeric,
     String,
@@ -13,6 +12,7 @@ from sqlalchemy import (
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from app.core.database import Base
+from app.core.dbtypes import UTCDateTime
 from app.models.base import UUIDMixin
 
 
@@ -25,7 +25,7 @@ class StockBalance(UUIDMixin, Base):
     quantity: Mapped[float] = mapped_column(Numeric(18, 4), nullable=False, default=0)
     avg_cost: Mapped[float] = mapped_column(Numeric(18, 4), nullable=False, default=0)
     updated_at: Mapped[datetime] = mapped_column(
-        DateTime(timezone=True), nullable=False, default=lambda: datetime.now(UTC)
+        UTCDateTime(), nullable=False, default=lambda: datetime.now(UTC)
     )
 
 
@@ -43,7 +43,7 @@ class StockMovement(UUIDMixin, Base):
     user_id: Mapped[uuid.UUID | None] = mapped_column(ForeignKey("users.id"))
     reason: Mapped[str | None] = mapped_column(Text)
     created_at: Mapped[datetime] = mapped_column(
-        DateTime(timezone=True), nullable=False, default=lambda: datetime.now(UTC)
+        UTCDateTime(), nullable=False, default=lambda: datetime.now(UTC)
     )
 
 
@@ -59,7 +59,7 @@ class StockAdjustment(UUIDMixin, Base):
     reason: Mapped[str] = mapped_column(Text, nullable=False)
     created_by: Mapped[uuid.UUID] = mapped_column(ForeignKey("users.id"), nullable=False)
     created_at: Mapped[datetime] = mapped_column(
-        DateTime(timezone=True), nullable=False, default=lambda: datetime.now(UTC)
+        UTCDateTime(), nullable=False, default=lambda: datetime.now(UTC)
     )
 
 
@@ -71,10 +71,10 @@ class StockCount(UUIDMixin, Base):
     status: Mapped[str] = mapped_column(String(20), nullable=False, default="counting")
     created_by: Mapped[uuid.UUID] = mapped_column(ForeignKey("users.id"), nullable=False)
     confirmed_by: Mapped[uuid.UUID | None] = mapped_column(ForeignKey("users.id"))
-    confirmed_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
+    confirmed_at: Mapped[datetime | None] = mapped_column(UTCDateTime())
     notes: Mapped[str | None] = mapped_column(Text)
     created_at: Mapped[datetime] = mapped_column(
-        DateTime(timezone=True), nullable=False, default=lambda: datetime.now(UTC)
+        UTCDateTime(), nullable=False, default=lambda: datetime.now(UTC)
     )
 
     items: Mapped[list["StockCountItem"]] = relationship(

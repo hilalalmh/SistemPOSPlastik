@@ -1,9 +1,3 @@
-export interface BarChartDatum {
-  label: string
-  value: number
-  hint?: string
-}
-
 export function BarChart({
   data,
   height = 200,

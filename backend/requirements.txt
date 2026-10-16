@@ -1,0 +1,16 @@
+# Runtime dependencies for cPanel / shared hosting (MySQL/MariaDB).
+# Install with:  pip install -r requirements.txt
+# Local development uses pyproject.toml (uv) and additionally psycopg for tests.
+
+fastapi>=0.115
+sqlalchemy>=2.0.36
+alembic>=1.14
+pymysql>=1.1
+a2wsgi>=1.10
+pydantic>=2.10
+pydantic-settings>=2.6
+pyjwt>=2.10
+pwdlib[argon2]>=0.2
+python-multipart>=0.0.18
+email-validator>=2.2
+python-barcode>=0.16.1

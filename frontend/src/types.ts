@@ -169,18 +169,6 @@ export interface SalesTrendReport {
   totals: SalesTrendRow
 }
 
-export interface StockRow {
-  variant_id: string
-  product_name?: string | null
-  sku?: string | null
-  unit_name?: string | null
-  quantity: string
-  avg_cost: string
-  stock_value: string
-  min_stock?: string | null
-  low_stock: boolean
-}
-
 export interface Movement {
   id: string
   variant_id: string

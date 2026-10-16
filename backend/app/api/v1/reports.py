@@ -1,14 +1,14 @@
-from datetime import date, datetime, time, timedelta
+from datetime import date, datetime, timedelta
 from decimal import Decimal
-from zoneinfo import ZoneInfo
 
 from fastapi import APIRouter, Depends, Query
 from sqlalchemy import func, select
 from sqlalchemy.orm import Session
 
 from app.api.deps import require_permission
-from app.core.config import settings
 from app.core.database import get_db
+from app.core.timeutil import day_bounds as _day_bounds
+from app.core.timeutil import tz as _tz
 from app.models.expense import Expense, ExpenseCategory
 from app.models.inventory import StockBalance
 from app.models.partner import Supplier
@@ -27,20 +27,6 @@ from app.permissions import (
 )
 
 router = APIRouter(prefix="/reports", tags=["reports"])
-
-
-def _tz() -> ZoneInfo:
-    try:
-        return ZoneInfo(settings.timezone)
-    except Exception:  # noqa: BLE001
-        return ZoneInfo("Asia/Jakarta")
-
-
-def _day_bounds(target: date) -> tuple[datetime, datetime]:
-    tz = _tz()
-    start = datetime.combine(target, time.min, tzinfo=tz)
-    end = start + timedelta(days=1)
-    return start, end
 
 
 @router.get("/dashboard")

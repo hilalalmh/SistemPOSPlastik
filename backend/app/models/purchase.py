@@ -2,7 +2,6 @@ import uuid
 from datetime import UTC, datetime
 
 from sqlalchemy import (
-    DateTime,
     ForeignKey,
     Numeric,
     String,
@@ -11,6 +10,7 @@ from sqlalchemy import (
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from app.core.database import Base
+from app.core.dbtypes import UTCDateTime
 from app.models.base import UUIDMixin
 
 
@@ -21,8 +21,8 @@ class Purchase(UUIDMixin, Base):
     supplier_id: Mapped[uuid.UUID] = mapped_column(ForeignKey("suppliers.id"), nullable=False)
     location_id: Mapped[uuid.UUID] = mapped_column(ForeignKey("locations.id"), nullable=False)
     status: Mapped[str] = mapped_column(String(30), nullable=False, default="draft")
-    ordered_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
-    received_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
+    ordered_at: Mapped[datetime | None] = mapped_column(UTCDateTime())
+    received_at: Mapped[datetime | None] = mapped_column(UTCDateTime())
     subtotal: Mapped[float] = mapped_column(Numeric(18, 2), nullable=False, default=0)
     discount_total: Mapped[float] = mapped_column(Numeric(18, 2), nullable=False, default=0)
     header_discount: Mapped[float] = mapped_column(Numeric(18, 2), nullable=False, default=0)
@@ -33,7 +33,7 @@ class Purchase(UUIDMixin, Base):
     created_by: Mapped[uuid.UUID] = mapped_column(ForeignKey("users.id"), nullable=False)
     received_by: Mapped[uuid.UUID | None] = mapped_column(ForeignKey("users.id"))
     created_at: Mapped[datetime] = mapped_column(
-        DateTime(timezone=True), nullable=False, default=lambda: datetime.now(UTC)
+        UTCDateTime(), nullable=False, default=lambda: datetime.now(UTC)
     )
 
     items: Mapped[list["PurchaseItem"]] = relationship(
@@ -69,7 +69,7 @@ class PurchaseReceipt(UUIDMixin, Base):
     number: Mapped[str] = mapped_column(String(100), nullable=False)
     received_by: Mapped[uuid.UUID] = mapped_column(ForeignKey("users.id"), nullable=False)
     received_at: Mapped[datetime] = mapped_column(
-        DateTime(timezone=True), nullable=False, default=lambda: datetime.now(UTC)
+        UTCDateTime(), nullable=False, default=lambda: datetime.now(UTC)
     )
     notes: Mapped[str | None] = mapped_column(Text)
 

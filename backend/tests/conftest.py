@@ -1,9 +1,7 @@
 import os
 
-os.environ.setdefault(
-    "DATABASE_URL", "postgresql+psycopg://postgres:postgres@localhost:5432/pos_test_db"
-)
-os.environ.setdefault("SECRET_KEY", "test-secret-key")
+os.environ["DATABASE_URL"] = "postgresql+psycopg://postgres:postgres@localhost:5432/pos_test_db"
+os.environ["SECRET_KEY"] = "test-secret-key"
 
 import uuid  # noqa: E402
 from decimal import Decimal  # noqa: E402

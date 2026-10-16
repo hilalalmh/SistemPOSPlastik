@@ -15,7 +15,7 @@ class Settings(BaseSettings):
     app_host: str = "0.0.0.0"
     app_port: int = 8000
 
-    database_url: str = "postgresql+psycopg://postgres:postgres@localhost:5432/pos_db"
+    database_url: str = "mysql+pymysql://pos_user:pos_pass@localhost:3306/pos_db"
 
     secret_key: str = "dev-secret-change-me"
     algorithm: str = "HS256"

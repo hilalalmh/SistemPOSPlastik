@@ -9,7 +9,6 @@ from collections.abc import Sequence
 
 import sqlalchemy as sa
 from alembic import op
-from sqlalchemy.dialects import postgresql
 
 revision: str = '38fb43b63056'
 down_revision: str | None = None
@@ -153,7 +152,7 @@ def upgrade() -> None:
     sa.Column('action', sa.String(length=100), nullable=False),
     sa.Column('entity_type', sa.String(length=80), nullable=False),
     sa.Column('entity_id', sa.Uuid(), nullable=True),
-    sa.Column('metadata', postgresql.JSONB(astext_type=sa.Text()), nullable=True),
+    sa.Column('metadata', sa.JSON(), nullable=True),
     sa.Column('ip_address', sa.String(length=45), nullable=True),
     sa.Column('created_at', sa.DateTime(timezone=True), nullable=False),
     sa.Column('id', sa.Uuid(), nullable=False),
@@ -201,7 +200,7 @@ def upgrade() -> None:
     sa.Column('endpoint', sa.String(length=150), nullable=False),
     sa.Column('request_hash', sa.String(length=64), nullable=False),
     sa.Column('status_code', sa.Integer(), nullable=True),
-    sa.Column('response_body', postgresql.JSONB(astext_type=sa.Text()), nullable=True),
+    sa.Column('response_body', sa.JSON(), nullable=True),
     sa.Column('created_at', sa.DateTime(timezone=True), nullable=False),
     sa.Column('expires_at', sa.DateTime(timezone=True), nullable=True),
     sa.Column('id', sa.Uuid(), nullable=False),

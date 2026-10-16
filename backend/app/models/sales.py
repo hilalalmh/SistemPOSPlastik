@@ -4,7 +4,6 @@ from typing import TYPE_CHECKING
 
 from sqlalchemy import (
     CheckConstraint,
-    DateTime,
     ForeignKey,
     Numeric,
     String,
@@ -13,6 +12,7 @@ from sqlalchemy import (
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from app.core.database import Base
+from app.core.dbtypes import UTCDateTime
 from app.models.base import UUIDMixin
 
 if TYPE_CHECKING:
@@ -25,9 +25,9 @@ class CashSession(UUIDMixin, Base):
     location_id: Mapped[uuid.UUID] = mapped_column(ForeignKey("locations.id"), nullable=False)
     cashier_id: Mapped[uuid.UUID] = mapped_column(ForeignKey("users.id"), nullable=False)
     opened_at: Mapped[datetime] = mapped_column(
-        DateTime(timezone=True), nullable=False, default=lambda: datetime.now(UTC)
+        UTCDateTime(), nullable=False, default=lambda: datetime.now(UTC)
     )
-    closed_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
+    closed_at: Mapped[datetime | None] = mapped_column(UTCDateTime())
     opening_cash: Mapped[float] = mapped_column(Numeric(18, 2), nullable=False, default=0)
     expected_cash: Mapped[float | None] = mapped_column(Numeric(18, 2))
     counted_cash: Mapped[float | None] = mapped_column(Numeric(18, 2))
@@ -50,7 +50,7 @@ class CashMovement(UUIDMixin, Base):
     reference_id: Mapped[uuid.UUID | None] = mapped_column()
     user_id: Mapped[uuid.UUID] = mapped_column(ForeignKey("users.id"), nullable=False)
     created_at: Mapped[datetime] = mapped_column(
-        DateTime(timezone=True), nullable=False, default=lambda: datetime.now(UTC)
+        UTCDateTime(), nullable=False, default=lambda: datetime.now(UTC)
     )
 
 
@@ -74,14 +74,14 @@ class Sale(UUIDMixin, Base):
     cost_total: Mapped[float] = mapped_column(Numeric(18, 2), nullable=False, default=0)
     notes: Mapped[str | None] = mapped_column(Text)
     sold_at: Mapped[datetime] = mapped_column(
-        DateTime(timezone=True), nullable=False, default=lambda: datetime.now(UTC)
+        UTCDateTime(), nullable=False, default=lambda: datetime.now(UTC)
     )
-    voided_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
+    voided_at: Mapped[datetime | None] = mapped_column(UTCDateTime())
     voided_by: Mapped[uuid.UUID | None] = mapped_column(ForeignKey("users.id"))
     void_reason: Mapped[str | None] = mapped_column(Text)
     idempotency_key: Mapped[str | None] = mapped_column(String(150), unique=True)
     created_at: Mapped[datetime] = mapped_column(
-        DateTime(timezone=True), nullable=False, default=lambda: datetime.now(UTC)
+        UTCDateTime(), nullable=False, default=lambda: datetime.now(UTC)
     )
 
     items: Mapped[list["SaleItem"]] = relationship(
@@ -113,7 +113,7 @@ class SaleItem(UUIDMixin, Base):
     cost_unit: Mapped[float] = mapped_column(Numeric(18, 4), nullable=False, default=0)
     cost_total: Mapped[float] = mapped_column(Numeric(18, 2), nullable=False, default=0)
     created_at: Mapped[datetime] = mapped_column(
-        DateTime(timezone=True), nullable=False, default=lambda: datetime.now(UTC)
+        UTCDateTime(), nullable=False, default=lambda: datetime.now(UTC)
     )
 
     sale: Mapped[Sale] = relationship(back_populates="items")
@@ -131,10 +131,10 @@ class Payment(UUIDMixin, Base):
     status: Mapped[str] = mapped_column(String(20), nullable=False, default="confirmed")
     reference_no: Mapped[str | None] = mapped_column(String(100))
     paid_at: Mapped[datetime] = mapped_column(
-        DateTime(timezone=True), nullable=False, default=lambda: datetime.now(UTC)
+        UTCDateTime(), nullable=False, default=lambda: datetime.now(UTC)
     )
     created_at: Mapped[datetime] = mapped_column(
-        DateTime(timezone=True), nullable=False, default=lambda: datetime.now(UTC)
+        UTCDateTime(), nullable=False, default=lambda: datetime.now(UTC)
     )
 
     sale: Mapped[Sale] = relationship(back_populates="payments")

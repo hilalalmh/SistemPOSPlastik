@@ -6,7 +6,7 @@
 **Bahasa:** Indonesia  
 **Tujuan:** Menjadi acuan kebutuhan produk, aturan bisnis, arsitektur, database, keamanan, pengujian, dan deployment untuk Sistem POS toko plastik.
 
-> **Catatan keputusan:** Dokumen ini menggunakan asumsi awal: satu toko/cabang, aplikasi web responsif, React untuk frontend, FastAPI untuk backend, PostgreSQL untuk database, harga eceran dan grosir, dukungan konversi satuan, serta pembayaran tunai dan non-tunai. Kebutuhan yang belum dipastikan ditandai sebagai keputusan yang perlu dikonfirmasi sebelum implementasi final.
+> **Catatan keputusan:** Dokumen ini menggunakan asumsi awal: satu toko/cabang, aplikasi web responsif, React untuk frontend, FastAPI untuk backend, MySQL/MariaDB untuk database (deployment cPanel), harga eceran dan grosir, dukungan konversi satuan, serta pembayaran tunai dan non-tunai. Kebutuhan yang belum dipastikan ditandai sebagai keputusan yang perlu dikonfirmasi sebelum implementasi final.
 
 ---
 
@@ -58,7 +58,7 @@ Fitur berikut tidak wajib untuk rilis MVP kecuali disetujui secara khusus:
 | Platform | Aplikasi web responsif |
 | Frontend | React + TypeScript |
 | Backend | Python + FastAPI |
-| Database | PostgreSQL |
+| Database | MySQL/MariaDB |
 | Komunikasi | REST API, JSON, HTTPS pada deployment |
 | Bahasa | Bahasa Indonesia |
 | Mata uang | Rupiah (IDR) |
@@ -405,12 +405,12 @@ Audit log berisi pelaku, aksi, entitas, ID entitas, waktu, dan metadata yang rel
 | UI | Tailwind CSS atau design system sejenis | Pilih satu pendekatan konsisten |
 | Backend | Python + FastAPI | REST API, validasi Pydantic |
 | ORM/migrasi | SQLAlchemy 2.x + Alembic | Skema database terkelola |
-| Database | PostgreSQL | Transaksi ACID dan konsistensi stok |
+| Database | MySQL/MariaDB (InnoDB) | Transaksi ACID dan konsistensi stok |
 | Auth | Session aman atau access/refresh token | Pilih berdasarkan deployment; jangan simpan token sensitif sembarangan |
 | Testing | Pytest, HTTPX, Vitest/React Testing Library | Backend dan frontend |
-| Deployment | Docker Compose untuk deployment sederhana | Reverse proxy HTTPS |
+| Deployment | cPanel shared hosting (Python App/Passenger, WSGI) | Lihat `Docs/deployment-mixmatch.md` |
 | Observability | Logging terstruktur dan health checks | Hindari data sensitif pada log |
-| Backup | PostgreSQL backup terjadwal | Uji pemulihan secara berkala |
+| Backup | Backup MySQL/MariaDB terjadwal | Uji pemulihan secara berkala |
 
 Versi library harus dipatok dan diperbarui melalui proses review. Jangan memakai dependensi yang tidak dipelihara atau mengandalkan versi floating di produksi.
 
@@ -428,7 +428,7 @@ Browser Kasir / Browser Admin
  Auth/RBAC  Domain     Reporting
             Services
        /       |       \
- PostgreSQL  File Storage (opsional)  Logs/Monitoring
+ MySQL       File Storage (opsional)  Logs/Monitoring
 ```
 
 ### 6.3 Prinsip backend
@@ -744,7 +744,7 @@ Contoh nama variabel, bukan nilai rahasia:
 APP_ENV=production
 APP_HOST=0.0.0.0
 APP_PORT=8000
-DATABASE_URL=postgresql+psycopg://USER:PASSWORD@HOST:5432/pos_db
+DATABASE_URL=mysql+pymysql://USER:PASSWORD@HOST:3306/pos_db
 SECRET_KEY=SET_VIA_SECRET_MANAGER
 CORS_ORIGINS=https://pos.example.com
 TIMEZONE=Asia/Jakarta
@@ -756,7 +756,7 @@ Jangan commit file `.env` produksi. Sertakan `.env.example` tanpa rahasia.
 
 - Reverse proxy dengan HTTPS.
 - Backend FastAPI dijalankan oleh process manager/container.
-- PostgreSQL tidak diekspos langsung ke internet.
+- Database MySQL/MariaDB tidak diekspos langsung ke internet.
 - Firewall hanya membuka port yang diperlukan.
 - Migrasi database dilakukan terencana sebelum aplikasi baru menerima trafik.
 - Health check dan log aplikasi aktif.
@@ -829,9 +829,6 @@ plastic-store-pos/
 │   ├── migrations/
 │   ├── tests/
 │   └── pyproject.toml
-├── infra/
-│   ├── docker/
-│   └── reverse-proxy/
 ├── docs/
 │   ├── erd.md
 │   ├── api.md
@@ -839,7 +836,6 @@ plastic-store-pos/
 │   └── operations.md
 ├── .env.example
 ├── .gitignore
-├── docker-compose.yml
 └── production.md
 ```
 
@@ -862,7 +858,7 @@ Struktur dapat disederhanakan pada MVP, tetapi batas tanggung jawab frontend, ba
 ### Tahap 1 — Fondasi aplikasi
 
 - Repository, konfigurasi, lint/format, dan test runner.
-- Database PostgreSQL dan migration awal.
+- Database MySQL/MariaDB dan migration awal.
 - Login, pengguna, role, permission.
 - Pengaturan toko dan audit log dasar.
 
@@ -1024,7 +1020,7 @@ Gunakan dokumen ini sebagai sumber kebutuhan utama dan implementasikan secara be
 1. Mulai dengan merangkum asumsi dan mengidentifikasi keputusan yang belum final. Jangan menambahkan fitur besar di luar scope tanpa persetujuan.
 2. Buat ERD, migration, API contract, dan user flow sebelum membangun semua halaman.
 3. Bangun fondasi backend dan test lebih dahulu untuk aturan kritis: harga bertingkat, konversi satuan, checkout atomik, idempotensi, dan stok.
-4. Gunakan PostgreSQL transaction untuk proses yang mengubah transaksi dan persediaan.
+4. Gunakan transaction database (MySQL/InnoDB) untuk proses yang mengubah transaksi dan persediaan.
 5. Implementasikan validasi dan permission di backend; frontend hanya menyajikan antarmuka.
 6. Buat UI kasir yang cepat, jelas, dan mudah digunakan dengan keyboard.
 7. Sediakan seed/demo data yang realistis tetapi tidak mengandung data pribadi nyata.

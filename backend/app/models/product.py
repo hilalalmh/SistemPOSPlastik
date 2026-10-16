@@ -4,7 +4,6 @@ from datetime import UTC, datetime
 from sqlalchemy import (
     Boolean,
     CheckConstraint,
-    DateTime,
     ForeignKey,
     Numeric,
     String,
@@ -14,6 +13,7 @@ from sqlalchemy import (
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from app.core.database import Base
+from app.core.dbtypes import UTCDateTime
 from app.models.base import TimestampMixin, UUIDMixin
 
 
@@ -116,8 +116,8 @@ class ProductPrice(UUIDMixin, Base):
     min_qty: Mapped[float] = mapped_column(Numeric(18, 4), nullable=False, default=0)
     max_qty: Mapped[float | None] = mapped_column(Numeric(18, 4))
     unit_price: Mapped[float] = mapped_column(Numeric(18, 2), nullable=False)
-    valid_from: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
-    valid_to: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
+    valid_from: Mapped[datetime | None] = mapped_column(UTCDateTime())
+    valid_to: Mapped[datetime | None] = mapped_column(UTCDateTime())
     is_active: Mapped[bool] = mapped_column(Boolean, nullable=False, default=True)
 
     variant: Mapped[ProductVariant] = relationship(back_populates="prices")
@@ -133,5 +133,5 @@ class PriceHistory(UUIDMixin, Base):
     new_price: Mapped[float] = mapped_column(Numeric(18, 2), nullable=False)
     changed_by: Mapped[uuid.UUID] = mapped_column(ForeignKey("users.id"), nullable=False)
     created_at: Mapped[datetime] = mapped_column(
-        DateTime(timezone=True), nullable=False, default=lambda: datetime.now(UTC)
+        UTCDateTime(), nullable=False, default=lambda: datetime.now(UTC)
     )
