@@ -55,19 +55,20 @@ Hasilnya backend ada di `~/repos/pos/backend` (berisi `passenger_wsgi.py`,
 
 > Alternatif tanpa Git: upload ZIP lalu ekstrak via File Manager ke `~/repos/pos`.
 
-### 3b. Auto-deploy dari Git (opsional, `.cpanel.yml`)
+### 3b. Auto-deploy dari Git (`.cpanel.yml`)
 
-Agar tombol **Deploy HEAD Commit** otomatis memasang dependensi dan menjalankan
-migrasi, buat file `.cpanel.yml` di root repo (sesuaikan nama app & versi Python):
+Repo sudah menyertakan `.cpanel.yml` di root. Sesuaikan `VENV` dan `APPDIR` di
+file itu dengan yang tampil di cPanel → **Setup Python App** (baris
+`source /home/USER/virtualenv/.../bin/activate`). Isinya menjalankan
+`pip install` + `alembic upgrade head` + restart Passenger setiap
+**Deploy HEAD Commit**.
 
 ```yaml
 ---
 deployment:
   tasks:
-    - export APPNAME=pos_backend
-    - export PYVER=3.11
-    - export VENV=$HOME/virtualenv/$APPNAME/$PYVER
-    - export APPDIR=$HOME/repos/pos/backend
+    - export VENV="$HOME/virtualenv/repos/pos/backend/3.11"
+    - export APPDIR="$HOME/repos/pos/backend"
     - $VENV/bin/pip install -r $APPDIR/requirements.txt
     - cd $APPDIR && $VENV/bin/alembic upgrade head
     - touch $APPDIR/passenger_wsgi.py
