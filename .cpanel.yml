@@ -4,7 +4,7 @@
 ---
 deployment:
   tasks:
-    - export VENV="$HOME/virtualenv/repos/pos/backend/3.11"
+    - export VENV="$HOME/virtualenv/repos/pos/backend/3.12"
     - export APPDIR="$HOME/repos/pos/backend"
     - $VENV/bin/pip install -r $APPDIR/requirements.txt
     - cd $APPDIR && $VENV/bin/alembic upgrade head

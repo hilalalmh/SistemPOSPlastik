@@ -1,7 +1,9 @@
+import json
 from functools import lru_cache
+from typing import Annotated
 
 from pydantic import field_validator
-from pydantic_settings import BaseSettings, SettingsConfigDict
+from pydantic_settings import BaseSettings, NoDecode, SettingsConfigDict
 
 
 class Settings(BaseSettings):
@@ -22,7 +24,7 @@ class Settings(BaseSettings):
     access_token_expire_minutes: int = 60
     refresh_token_expire_days: int = 7
 
-    cors_origins: list[str] = ["http://localhost:5173"]
+    cors_origins: Annotated[list[str], NoDecode] = ["http://localhost:5173"]
     timezone: str = "Asia/Jakarta"
 
     login_max_attempts: int = 5
@@ -32,7 +34,16 @@ class Settings(BaseSettings):
     @classmethod
     def split_origins(cls, value):
         if isinstance(value, str):
-            return [origin.strip() for origin in value.split(",") if origin.strip()]
+            raw = value.strip()
+            if raw.startswith("["):
+                try:
+                    parsed = json.loads(raw)
+                except ValueError:
+                    pass
+                else:
+                    if isinstance(parsed, list):
+                        return [str(item) for item in parsed]
+            return [origin.strip() for origin in raw.split(",") if origin.strip()]
         return value
 
 

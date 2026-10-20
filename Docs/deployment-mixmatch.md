@@ -6,8 +6,8 @@ Panduan menaruh Sistem POS Toko Plastik di shared hosting cPanel: backend FastAP
 ## Arsitektur
 
 ```
-pos.domain.com   -> file statis frontend (hasil `npm run build`)   [public_html]
-api.domain.com   -> backend FastAPI (Passenger + passenger_wsgi.py)
+pos.sistemposplastik.area.web.id   -> file statis frontend (hasil `npm run build`)   [public_html]
+api.sistemposplastik.area.web.id   -> backend FastAPI (Passenger + passenger_wsgi.py)
 ```
 
 - Backend memakai **MySQL/MariaDB** (bukan PostgreSQL) dan **WSGI** (bukan uvicorn).
@@ -18,13 +18,13 @@ api.domain.com   -> backend FastAPI (Passenger + passenger_wsgi.py)
 
 - Paket hosting cPanel yang menyediakan **Setup Python App** (Passenger) dan MySQL.
 - Akses SSH (disarankan) atau minimal Terminal + File Manager + PHP/cron.
-- Python 3.11/3.12 dipilih dari cPanel.
+- Python 3.12 dipilih dari cPanel.
 - Dua subdomain (gratis dari cPanel) atau 1 domain + 1 subdomain.
 
 ## 1. Subdomain & SSL
 
-1. cPanel → **Domains / Subdomains**: buat `api.domain.com` (docroot kosong) dan
-   `pos.domain.com` (docroot `public_html` atau folder khusus).
+1. cPanel → **Domains / Subdomains**: buat `api.sistemposplastik.area.web.id` (docroot kosong) dan
+   `pos.sistemposplastik.area.web.id` (docroot `public_html` atau folder khusus).
 2. Aktifkan **AutoSSL/Let's Encrypt** untuk keduanya, tunggu sampai HTTPS aktif.
 
 ## 2. Database MySQL
@@ -67,7 +67,7 @@ file itu dengan yang tampil di cPanel → **Setup Python App** (baris
 ---
 deployment:
   tasks:
-    - export VENV="$HOME/virtualenv/repos/pos/backend/3.11"
+    - export VENV="$HOME/virtualenv/repos/pos/backend/3.12"
     - export APPDIR="$HOME/repos/pos/backend"
     - $VENV/bin/pip install -r $APPDIR/requirements.txt
     - cd $APPDIR && $VENV/bin/alembic upgrade head
@@ -83,9 +83,9 @@ cPanel → **Setup Python App** → **Create Application**:
 
 | Field | Nilai |
 | --- | --- |
-| Python version | 3.11 atau 3.12 |
+| Python version | 3.12 |
 | Application root | `repos/pos/backend` |
-| Application URL | `api.domain.com` |
+| Application URL | `api.sistemposplastik.area.web.id` |
 | Application startup file | `passenger_wsgi.py` |
 | Application Entry point | `application` |
 
@@ -104,7 +104,7 @@ DATABASE_URL=mysql+pymysql://USER:PASSWORD@localhost:DBNAME
 SECRET_KEY=<hasil generate>
 ACCESS_TOKEN_EXPIRE_MINUTES=60
 REFRESH_TOKEN_EXPIRE_DAYS=7
-CORS_ORIGINS=https://pos.domain.com
+CORS_ORIGINS=https://pos.sistemposplastik.area.web.id
 TIMEZONE=Asia/Jakarta
 ```
 
@@ -121,7 +121,7 @@ Backend punya `requirements.txt` (khusus hosting, tanpa psycopg).
 - Atau via SSH:
 
 ```bash
-source ~/virtualenv/pos_backend/3.11/bin/activate   # sesuaikan nama/path
+source ~/virtualenv/repos/pos/backend/3.12/bin/activate   # sesuaikan nama/path
 cd ~/repos/pos/backend
 pip install -r requirements.txt
 ```
@@ -131,7 +131,7 @@ pip install -r requirements.txt
 Jalankan dengan virtualenv yang sama:
 
 ```bash
-source ~/virtualenv/pos_backend/3.11/bin/activate
+source ~/virtualenv/repos/pos/backend/3.12/bin/activate
 cd ~/repos/pos/backend
 alembic upgrade head        # buat semua tabel
 python -m app.seed          # data awal (role, user, contoh produk)
@@ -148,13 +148,13 @@ Build di komputer (bukan di hosting), arahkan ke API produksi:
 ```bash
 cd frontend
 # PowerShell
-$env:VITE_API_BASE="https://api.domain.com/api/v1"; npm run build
+$env:VITE_API_BASE="https://api.sistemposplastik.area.web.id/api/v1"; npm run build
 # bash
-VITE_API_BASE=https://api.domain.com/api/v1 npm run build
+VITE_API_BASE=https://api.sistemposplastik.area.web.id/api/v1 npm run build
 ```
 
 Upload **isi** `frontend/dist/` ke docroot frontend (`public_html` untuk
-`pos.domain.com`). File `public/.htaccess` sudah ikut ter-build ke `dist/` dan
+`pos.sistemposplastik.area.web.id`). File `public/.htaccess` sudah ikut ter-build ke `dist/` dan
 menangani SPA fallback (React Router).
 
 > Frontend **tidak** di-deploy lewat Git karena folder `dist` hasil build tidak
@@ -162,11 +162,11 @@ menangani SPA fallback (React Router).
 
 ## 7. Verifikasi
 
-1. `https://api.domain.com/api/health` → `{"status":"ok","version":"1.0.0"}`.
-2. Buka `https://pos.domain.com`, login, cek dashboard menampilkan data.
+1. `https://api.sistemposplastik.area.web.id/api/health` → `{"status":"ok","version":"1.0.0"}`.
+2. Buka `https://pos.sistemposplastik.area.web.id`, login, cek dashboard menampilkan data.
 3. Uji mutasi (buat produk, transaksi kasir) untuk memastikan tulis-baca MySQL OK.
 4. Jika login gagal karena CORS: pastikan `CORS_ORIGINS` persis sama dengan origin
-   frontend (`https://pos.domain.com`, tanpa trailing slash) lalu restart app
+   frontend (`https://pos.sistemposplastik.area.web.id`, tanpa trailing slash) lalu restart app
    (touch `passenger_wsgi.py` atau Restart di panel Python).
 
 ## 8. Operasional
@@ -179,7 +179,7 @@ menangani SPA fallback (React Router).
   Tanpa `.cpanel.yml`, setelah pull jalankan:
 
   ```bash
-  source ~/virtualenv/pos_backend/3.11/bin/activate
+  source ~/virtualenv/repos/pos/backend/3.12/bin/activate
   cd ~/repos/pos/backend
   pip install -r requirements.txt
   alembic upgrade head
@@ -194,7 +194,7 @@ menangani SPA fallback (React Router).
 
 | Gejala | Penyebab umum | Solusi |
 | --- | --- | --- |
-| 500 di `api.domain.com` | dependensi belum terpasang / entry point salah | cek `stderr.log`, pastikan Startup file `passenger_wsgi.py` & entry point `application`, ulangi Run Pip Install |
+| 500 di `api.sistemposplastik.area.web.id` | dependensi belum terpasang / entry point salah | cek `stderr.log`, pastikan Startup file `passenger_wsgi.py` & entry point `application`, ulangi Run Pip Install |
 | `Access denied for user` | kredensial DB salah / user belum di-Add ke DB | perbaiki `DATABASE_URL`, pastikan user punya ALL PRIVILEGES |
 | `ModuleNotFoundError: No module named 'a2wsgi'` | pip install belum dijalankan di venv app | jalankan Run Pip Install / `pip install -r requirements.txt` di venv app |
 | Halaman putih / 404 saat refresh di frontend | `.htaccess` SPA tidak terpasang | upload ulang `dist` termasuk `.htaccess` |
